@@ -40,7 +40,7 @@ public class OverlayIndex
 	{
 		InputStream indexStream = OverlayIndex.class.getResourceAsStream("/runelite/index");
 
-		try (DataInputStream in = new DataInputStream(indexStream))
+		/*try (DataInputStream in = new DataInputStream(indexStream))
 		{
 			int id;
 			while ((id = in.readInt()) != -1)
@@ -51,7 +51,7 @@ public class OverlayIndex
 		catch (IOException ex)
 		{
 			log.warn("unable to load overlay index", ex);
-		}
+		}*/
 	}
 
 	public static boolean hasOverlay(int indexId, int archiveId)

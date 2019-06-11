@@ -33,6 +33,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -141,7 +144,7 @@ public class ClientLoader
 			}
 			URL url = new URL("https://raw.githubusercontent.com/runelite-extended/maven-repo/master/live/injected-client.jar");
 			ReadableByteChannel readableByteChannel = Channels.newChannel(url.openStream());
-			File LOCAL_INJECTED_CLIENT = new File("./injected-client/target/injected-client-" + RuneLiteAPI.getVersion() + ".jar");
+			File LOCAL_INJECTED_CLIENT = new File("./injected-client/target/injected-client.jar");
 			File INJECTED_CLIENT = new File(RUNELITE_DIR + "/injected-client.jar");
 			INJECTED_CLIENT.mkdirs();
 			if (INJECTED_CLIENT.exists())
@@ -163,7 +166,7 @@ public class ClientLoader
 
 			JarInputStream fis;
 
-			if (updateCheckMode == CUSTOM)
+			if (true)
 			{
 				System.out.println("Using local injected client");
 				fis = new JarInputStream(new FileInputStream(LOCAL_INJECTED_CLIENT));
@@ -216,7 +219,24 @@ public class ClientLoader
 				}
 			};
 
+			config.getAppletProperties().put("17","http://127.0.0.1/");
+			config.getClassLoaderProperties().put("codebase", "http://127.0.0.1/");
+
 			Class<?> clientClass = rsClassLoader.loadClass(initialClass);
+
+			try {
+				Field fld = rsClassLoader.loadClass("cm").getDeclaredField("f");
+				fld.setAccessible(true);
+
+				Field modifierField = Field.class.getDeclaredField("modifiers");
+				modifierField.setAccessible(true);
+				modifierField.setInt(fld, fld.getModifiers() & ~Modifier.FINAL);
+
+				fld.set(null, new BigInteger("83ff79a3e258b99ead1a70e1049883e78e513c4cdec538d8da9483879a9f81689c0c7d146d7b82b52d05cf26132b1cda5930eeef894e4ccf3d41eebc3aabe54598c4ca48eb5a31d736bfeea17875a35558b9e3fcd4aebe2a9cc970312a477771b36e173dc2ece6001ab895c553e2770de40073ea278026f36961c94428d8d7db", 16));
+
+			} catch (NoSuchFieldException e) {
+				e.printStackTrace();
+			}
 
 			Applet rs = (Applet) clientClass.newInstance();
 			rs.setStub(new RSAppletStub(config));
